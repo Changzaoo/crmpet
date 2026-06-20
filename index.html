@@ -588,9 +588,123 @@ tbody tr:last-child td{border-bottom:none}
 @keyframes vanpulse{0%,100%{box-shadow:0 6px 16px -6px rgba(240,89,31,.6),0 0 0 4px color-mix(in srgb,var(--coral) 22%,transparent)}50%{box-shadow:0 6px 16px -6px rgba(240,89,31,.6),0 0 0 9px color-mix(in srgb,var(--coral) 6%,transparent)}}
 @media(max-width:980px){.ent-grid{grid-template-columns:1fr}#entMap{height:clamp(280px,40vh,380px)}.ent-list{max-height:none}}
 @media(prefers-reduced-motion:reduce){.ent-van.moving{animation:none}}
+
+/* ===== TELA DE AUTH CRM ===== */
+#crmAuthWrap{
+  position:fixed;inset:0;z-index:9999;
+  display:none;align-items:center;justify-content:center;
+  background:radial-gradient(1000px 700px at 50% 0%,rgba(14,124,134,.14),transparent 60%),var(--bg);
+  padding:20px;
+}
+.crm-auth-card{
+  width:100%;max-width:420px;background:var(--surface);
+  border:1px solid var(--hair);border-radius:28px;
+  box-shadow:0 40px 100px -30px rgba(20,40,50,.24),0 8px 24px -8px rgba(20,40,50,.08);
+  overflow:hidden;
+}
+.crm-auth-head{
+  background:var(--grad);padding:36px 32px 28px;text-align:center;position:relative;overflow:hidden;
+}
+.crm-auth-head::before{
+  content:"";position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+  border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%);
+  pointer-events:none;
+}
+.crm-auth-head .logo{
+  width:60px;height:60px;border-radius:18px;
+  background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.28);
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-bottom:14px;backdrop-filter:blur(10px);position:relative;z-index:1;
+}
+.crm-auth-head .logo .msi{font-size:30px;color:#fff}
+.crm-auth-head h1{font-size:1.5rem;font-weight:800;color:#fff;position:relative;z-index:1}
+.crm-auth-head p{font-size:.8rem;color:rgba(255,255,255,.8);margin-top:5px;position:relative;z-index:1;font-weight:500}
+.crm-auth-body{padding:28px 28px 32px;display:flex;flex-direction:column;gap:14px}
+.crm-field{display:flex;flex-direction:column;gap:6px}
+.crm-field label{font-size:.73rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.crm-field input{
+  padding:13px 15px;border:1.5px solid var(--border);border-radius:13px;
+  font-size:.98rem;font-family:inherit;background:var(--bg-2);color:var(--text);
+  font-weight:500;transition:border-color .18s;outline:none;
+}
+.crm-field input:focus{border-color:var(--accent);background:var(--surface)}
+.crm-btn-main{
+  width:100%;padding:15px;border:none;border-radius:14px;
+  background:var(--grad-coral);color:#fff;font-family:inherit;
+  font-weight:800;font-size:1rem;cursor:pointer;
+  box-shadow:0 12px 28px -10px rgba(240,89,31,.45);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .18s,opacity .18s;
+}
+.crm-btn-main:active{transform:scale(.97)}
+.crm-btn-main:disabled{opacity:.5;cursor:not-allowed}
+.crm-sep{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:.76rem;font-weight:600}
+.crm-sep::before,.crm-sep::after{content:"";flex:1;height:1px;background:var(--border)}
+.crm-btn-google{
+  width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:13px;
+  background:var(--surface);color:var(--text);font-family:inherit;
+  font-weight:700;font-size:.9rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:border-color .18s,background .18s;
+}
+.crm-btn-google:hover{border-color:var(--accent);background:var(--bg-2)}
+.crm-btn-google svg{width:18px;height:18px;flex:none}
+.crm-auth-err{
+  background:color-mix(in srgb,#E5484D 10%,transparent);
+  border:1px solid color-mix(in srgb,#E5484D 28%,transparent);
+  border-radius:11px;padding:10px 14px;font-size:.82rem;font-weight:600;
+  color:#C2363B;display:none;
+}
+[data-theme="dark"] .crm-auth-err{color:#FF6B6E}
+.crm-auth-err.show{display:block}
+.crm-auth-note{
+  font-size:.76rem;color:var(--faint);text-align:center;line-height:1.55;
+  border-top:1px solid var(--hair);padding-top:14px;
+}
+.crm-auth-note b{color:var(--muted)}
+.crm-reset-link{
+  text-align:center;font-size:.8rem;color:var(--accent);font-weight:600;
+  cursor:pointer;background:none;border:none;font-family:inherit;padding:2px;
+}
 </style>
 </head>
 <body>
+
+<!-- ===== TELA DE AUTH CRM ===== -->
+<div id="crmAuthWrap" style="display:flex">
+  <div class="crm-auth-card">
+    <div class="crm-auth-head">
+      <div class="logo"><span class="msi">manage_accounts</span></div>
+      <h1>PetNexus Gestor</h1>
+      <p>Acesso restrito à equipe autorizada</p>
+    </div>
+    <div class="crm-auth-body">
+      <div id="crmAuthErr" class="crm-auth-err"></div>
+      <div class="crm-field">
+        <label for="crmEmail">E-mail profissional</label>
+        <input id="crmEmail" type="email" inputmode="email" autocomplete="email" placeholder="funcionario@petshop.com.br">
+      </div>
+      <div class="crm-field">
+        <label for="crmSenha">Senha</label>
+        <input id="crmSenha" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="crm-btn-main" id="crmBtnEntrar" onclick="crmDoLogin()">
+        <span class="msi">login</span> Entrar no sistema
+      </button>
+      <button class="crm-reset-link" onclick="crmDoReset()">Esqueci minha senha</button>
+      <div class="crm-sep">ou</div>
+      <button class="crm-btn-google" id="crmBtnGoogle" onclick="crmDoGoogle()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Entrar com Google
+      </button>
+      <div class="crm-auth-note">
+        <b>Apenas e-mails autorizados têm acesso.</b><br>
+        Solicite ao administrador que cadastre seu e-mail antes do primeiro login.
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== /TELA DE AUTH CRM ===== -->
 
 <aside id="side">
   <div class="logo"><span class="p"><span class=msi>pets</span></span>Pet<b>Nexus</b></div>
@@ -4085,6 +4199,104 @@ async function eqTrocarSenha(){
   }catch(e){toast('Não foi possível: '+eqErr(e));}
   finally{btn.disabled=false;}
 }
+
+/* ===================================================================== */
+/* ===== AUTH CRM — gate de acesso ===================================== */
+;(function crmAuthGate(){
+  const wrap=document.getElementById('crmAuthWrap');
+  const A=window.PetNexusAuth;
+
+  function crmFirebaseErr(e){
+    const map={
+      'auth/invalid-email':'E-mail inválido.',
+      'auth/user-not-found':'Usuário não encontrado. Verifique se o e-mail foi autorizado.',
+      'auth/wrong-password':'Senha incorreta.',
+      'auth/invalid-credential':'E-mail ou senha incorretos.',
+      'auth/too-many-requests':'Muitas tentativas. Aguarde alguns minutos.',
+      'auth/network-request-failed':'Sem conexão. Verifique sua internet.',
+      'auth/popup-closed-by-user':'Login cancelado.',
+      'auth/cancelled-popup-request':'Login cancelado.',
+    };
+    return map[e&&e.code]||'Erro inesperado. Tente novamente.';
+  }
+
+  function showErrCRM(msg){
+    const el=document.getElementById('crmAuthErr');
+    if(el){el.textContent=msg;el.classList.add('show');}
+  }
+  function clearErrCRM(){
+    const el=document.getElementById('crmAuthErr');
+    if(el){el.textContent='';el.classList.remove('show');}
+  }
+  function busyCRM(b){
+    ['crmBtnEntrar','crmBtnGoogle'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.disabled=b;
+    });
+  }
+
+  window.crmDoLogin=async function(){
+    if(!A||!A.available()){showErrCRM('Firebase não configurado em petnexus-firebase.js');return;}
+    clearErrCRM();
+    const email=document.getElementById('crmEmail').value.trim();
+    const senha=document.getElementById('crmSenha').value;
+    if(!email||!senha){showErrCRM('Preencha e-mail e senha.');return;}
+    busyCRM(true);
+    try{await A.login(email,senha);}
+    catch(e){busyCRM(false);showErrCRM(crmFirebaseErr(e));}
+  };
+
+  window.crmDoGoogle=async function(){
+    if(!A||!A.available()){showErrCRM('Firebase não configurado em petnexus-firebase.js');return;}
+    clearErrCRM();busyCRM(true);
+    try{await A.loginGoogle();}
+    catch(e){busyCRM(false);showErrCRM(crmFirebaseErr(e));}
+  };
+
+  window.crmDoReset=async function(){
+    if(!A||!A.available()){showErrCRM('Firebase não configurado.');return;}
+    clearErrCRM();
+    const email=document.getElementById('crmEmail').value.trim();
+    if(!email){showErrCRM('Informe o e-mail para redefinir a senha.');return;}
+    try{await A.resetByEmail(email);showErrCRM('E-mail de redefinição enviado ✓');}
+    catch(e){showErrCRM(crmFirebaseErr(e));}
+  };
+
+  function showCRMApp(){if(wrap)wrap.style.display='none';}
+  function showCRMAuth(){
+    if(wrap)wrap.style.display='flex';
+    clearErrCRM();busyCRM(false);
+  }
+
+  if(!A||!A.available()){
+    // Firebase não configurado — exibe o CRM em modo demo (sem login)
+    showCRMApp();
+    return;
+  }
+
+  A.onUser(async function(user){
+    if(!user){showCRMAuth();return;}
+    // Verifica se o e-mail está na allowlist (role staff/admin)
+    const allowed=await A.emailAllowedRole(user.email).catch(()=>null);
+    if(allowed){
+      showCRMApp();
+      // Atualiza indicador de usuário logado (topbar)
+      const pill=document.getElementById('eqPill');
+      if(pill){
+        pill.style.display='flex';
+        const nm=document.getElementById('eqNome');
+        if(nm)nm.textContent=user.displayName||user.email;
+      }
+    }else{
+      // Logado mas não autorizado
+      try{await firebase.auth().signOut();}catch(_){}
+      showErrCRM('Seu e-mail não está autorizado. Solicite acesso ao administrador.');
+      showCRMAuth();
+    }
+  });
+})();
+
+// Enter key no login do CRM
+;(function(){['crmEmail','crmSenha'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('keydown',e=>{if(e.key==='Enter')window.crmDoLogin&&window.crmDoLogin();});});})();
 
 /* ===================================================================== */
 /* ===== INIT ======================================================= */
