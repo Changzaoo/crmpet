@@ -18,8 +18,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
 <script src="petnexus-firebase.js"></script>
-<script>window.PETNEXUS_APP_ROLE='staff';</script>
+<script>window.PETNEXUS_APP_ROLE='staff';window.PETNEXUS_APP_DOMAIN='pet.com';</script>
 <script src="petnexus-auth.js"></script>
+<script src="petnexus-data.js"></script>
+<script src="petnexus-tour.js"></script>
 <style>
 :root{
   color-scheme:light;
@@ -198,7 +200,7 @@ tbody tr:last-child td{border-bottom:none}
 .modal .acts{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap}
 .f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .f3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(140px);background:var(--surface);color:var(--text);border:1px solid var(--border);padding:13px 22px;border-radius:50px;font-size:.89rem;font-weight:500;z-index:300;transition:transform .5s var(--spring),opacity .3s var(--ease);box-shadow:var(--shadow);display:flex;align-items:center;gap:9px;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);opacity:0;max-width:90vw}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(140px);background:var(--surface);color:var(--text);border:1px solid var(--border);padding:13px 22px;border-radius:50px;font-size:.89rem;font-weight:500;z-index:300;transition:transform .5s var(--spring),opacity .3s var(--ease);box-shadow:var(--shadow);display:flex;align-items:center;gap:9px;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);opacity:0;max-width:min(90vw,440px)}
 .toast::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--verde);box-shadow:0 0 0 3px color-mix(in srgb,var(--verde) 22%,transparent);flex:none}
 .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
 
@@ -517,7 +519,7 @@ tbody tr:last-child td{border-bottom:none}
 @keyframes nbpop{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
 .notif-btn.ring{animation:nbring .6s var(--ease)}
 @keyframes nbring{0%,100%{transform:rotate(0)}15%{transform:rotate(-13deg)}30%{transform:rotate(11deg)}45%{transform:rotate(-9deg)}60%{transform:rotate(6deg)}75%{transform:rotate(-3deg)}}
-.notif-panel{position:absolute;top:calc(100% + 12px);right:0;width:392px;max-width:calc(100vw - 24px);background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);z-index:80;display:none;flex-direction:column;max-height:min(560px,80vh);overflow:hidden}
+.notif-panel{position:fixed;top:72px;right:18px;width:392px;max-width:calc(100vw - 24px);background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);z-index:120;display:none;flex-direction:column;max-height:min(560px,80vh);overflow:hidden}
 .notif-panel.on{display:flex;animation:pop .34s var(--spring);transform-origin:top right}
 .notif-head{padding:16px 18px 13px;border-bottom:1px solid var(--hair);display:flex;align-items:center;gap:10px}
 .notif-head h3{font-size:1.04rem;font-weight:700;margin:0}
@@ -675,14 +677,14 @@ tbody tr:last-child td{border-bottom:none}
   <div class="crm-auth-card">
     <div class="crm-auth-head">
       <div class="logo"><span class="msi">manage_accounts</span></div>
-      <h1>PetNexus Gestor</h1>
-      <p>Acesso restrito à equipe autorizada</p>
+      <h1>PetNexus Gestor <span class="msi" style="font-size:1rem;vertical-align:middle;color:var(--muted)" title="Acesso restrito">lock</span></h1>
+      <p><span class="msi" style="font-size:.95rem;vertical-align:middle">lock</span> Acesso restrito à equipe autorizada</p>
     </div>
     <div class="crm-auth-body">
       <div id="crmAuthErr" class="crm-auth-err"></div>
       <div class="crm-field">
         <label for="crmEmail">E-mail profissional</label>
-        <input id="crmEmail" type="email" inputmode="email" autocomplete="email" placeholder="funcionario@petshop.com.br">
+        <input id="crmEmail" type="email" inputmode="email" autocomplete="email" placeholder="voce@pet.com">
       </div>
       <div class="crm-field">
         <label for="crmSenha">Senha</label>
@@ -692,11 +694,7 @@ tbody tr:last-child td{border-bottom:none}
         <span class="msi">login</span> Entrar no sistema
       </button>
       <button class="crm-reset-link" onclick="crmDoReset()">Esqueci minha senha</button>
-      <div class="crm-sep">ou</div>
-      <button class="crm-btn-google" id="crmBtnGoogle" onclick="crmDoGoogle()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-        Entrar com Google
-      </button>
+      <div class="auth-restricted" style="margin-top:14px;text-align:center;font-size:.82rem;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px"><span class="msi" style="font-size:1rem">lock</span> Acesso restrito à equipe — contas criadas pelo administrador.</div>
     </div>
   </div>
 </div>
@@ -711,6 +709,7 @@ tbody tr:last-child td{border-bottom:none}
     <a data-v="clientes"><span class="ic"><span class=msi>pets</span></span> Clientes & Pets</a>
     <a data-v="os"><span class="ic"><span class=msi>assignment</span></span> Atendimentos / OS</a>
     <a data-v="entregas"><span class="ic"><span class=msi>local_shipping</span></span> Entregas <span class="badge" id="nbEnt" style="display:none">0</span></a>
+    <a data-v="frota"><span class="ic"><span class=msi>two_wheeler</span></span> Frota / Entregadores</a>
     <a data-v="saude"><span class="ic"><span class=msi>vaccines</span></span> Saúde & Vacinas <span class="badge" id="nbSaude" style="display:none">0</span></a>
     <div class="grp">Comercial</div>
     <a data-v="estoque"><span class="ic"><span class=msi>inventory_2</span></span> Estoque & Produtos <span class="badge" id="nbEst" style="display:none">0</span></a>
@@ -754,6 +753,8 @@ tbody tr:last-child td{border-bottom:none}
     <section class="view" id="os"></section>
     <!-- ENTREGAS AO VIVO -->
     <section class="view" id="entregas"></section>
+    <!-- FROTA / ENTREGADORES -->
+    <section class="view" id="frota"></section>
     <!-- SAÚDE -->
     <section class="view" id="saude"></section>
     <!-- ESTOQUE -->
@@ -998,7 +999,7 @@ function osTotal(o){const sub=o.itens.reduce((s,i)=>s+i.preco*i.qtd,0);return Ma
 
 /* ===================================================================== */
 /* ===== NAV =========================================================== */
-const titles={dash:['Painel','Visão geral da sua operação'],agenda:['Agenda','Banho, tosa e consultas'],clientes:['Clientes & Pets','Base de tutores e seus pets'],os:['Atendimentos / OS','Ordens de serviço'],entregas:['Entregas ao vivo','Acompanhe a frota em tempo real'],saude:['Saúde & Vacinas','Prontuário e recorrências'],estoque:['Estoque & Produtos','Controle de mercadorias'],pdv:['Vendas / PDV','Frente de caixa'],fin:['Financeiro','Receitas, despesas e lucro'],fid:['Fidelidade','Clube de pontos e relacionamento'],msg:['Mensagens','Atendimento ao cliente pelo app'],config:['Configurações','Negócio, equipe e integrações'],equipe:['Equipe & Acessos','Cargos, hierarquia e novos usuários']};
+const titles={dash:['Painel','Visão geral da sua operação'],agenda:['Agenda','Banho, tosa e consultas'],clientes:['Clientes & Pets','Base de tutores e seus pets'],os:['Atendimentos / OS','Ordens de serviço'],entregas:['Entregas ao vivo','Acompanhe a frota em tempo real'],frota:['Frota / Entregadores','Aprovação de entregadores e despacho de corridas'],saude:['Saúde & Vacinas','Prontuário e recorrências'],estoque:['Estoque & Produtos','Controle de mercadorias'],pdv:['Vendas / PDV','Frente de caixa'],fin:['Financeiro','Receitas, despesas e lucro'],fid:['Fidelidade','Clube de pontos e relacionamento'],msg:['Mensagens','Atendimento ao cliente pelo app'],config:['Configurações','Negócio, equipe e integrações'],equipe:['Equipe & Acessos','Cargos, hierarquia e novos usuários']};
 const renderers={};
 let _curView='dash';
 function go(v){
@@ -1013,6 +1014,9 @@ function go(v){
   $('side').classList.remove('open');
   if(renderers[v])renderers[v]();
   if(v==='entregas'&&typeof entViewEnter==='function')entViewEnter();
+  /* PetNexus App (Supabase): exibe agendamentos/conversas vindos do app, sem alterar o estado local */
+  if(v==='agenda'&&typeof syncAgendamentosApp==='function')syncAgendamentosApp();
+  if(v==='msg'&&typeof syncMensagensApp==='function')syncMensagensApp();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 document.querySelectorAll('.navi a').forEach(a=>a.onclick=()=>go(a.dataset.v));
@@ -1145,6 +1149,255 @@ function agendaFiltrada(){return DB.agenda.filter(a=>a.data===agFiltro.data
   &&(agFiltro.status==='Todos'||a.status===agFiltro.status)
   &&(!agFiltro.profId||a.profId===agFiltro.profId))
   .sort((x,y)=>x.hora.localeCompare(y.hora));}
+
+/* ===================================================================== */
+/* ===== Integração PetNexus App (Supabase) — somente LEITURA ========== */
+/* Não altera DB.agenda nem o chat local; apenas EXIBE o que os clientes  */
+/* criam no app (schema petnexus) numa faixa "📱 Vindos do App".          */
+/* ===================================================================== */
+function _pnAppReady(){
+  try{return !!(window.PetNexusAuth&&PetNexusAuth.db&&PetNexusAuth.user&&PetNexusAuth.user());}
+  catch(_){return false;}
+}
+/* ===================================================================== */
+/* ===== MODO DEMO (sem Firebase/Supabase — dados locais demonstrativos) */
+/* ===================================================================== */
+const AUTH_DEMO_KEY='petnexus_crm_demo_mode';
+let _authDemoMode=false;
+/* Conjunto demonstrativo rico para vender o sistema ao dono do petshop.
+   Espelha o formato dos RPCs do Supabase (staffAgendamentos/staffConversas/staffMensagens). */
+const DEMO_DATA={
+  agendamentos:[
+    {id:'d1',data:todayISO(),hora:'09:00',pet:'Thor',cliente:'Mariana Lopes',servico:'Banho & Tosa Higiênica',status:'Confirmado',leva_traz:true},
+    {id:'d2',data:todayISO(),hora:'10:30',pet:'Luna',cliente:'Carlos Eduardo',servico:'Banho',status:'Aguardando',leva_traz:false},
+    {id:'d3',data:todayISO(),hora:'14:00',pet:'Bidu',cliente:'Patrícia Souza',servico:'Tosa na Tesoura',status:'Confirmado',leva_traz:false},
+    {id:'d4',data:addDays(todayISO(),1),hora:'11:00',pet:'Mel',cliente:'Rafael Andrade',servico:'Banho & Hidratação',status:'Aguardando',leva_traz:true},
+    {id:'d5',data:addDays(todayISO(),1),hora:'16:30',pet:'Rex',cliente:'Juliana Castro',servico:'Consulta Veterinária',status:'Confirmado',leva_traz:false}
+  ],
+  conversas:[
+    {id:'c1',nome:'Mariana Lopes',pet:'Thor',emoji:'🐶',ultima:'Perfeito, obrigada! Até amanhã 😊',ultimo_remetente:'cliente',ultimo_ts:Date.now()-1000*60*8,nao_lidas:2},
+    {id:'c2',nome:'Carlos Eduardo',pet:'Luna',emoji:'🐱',ultima:'Você: Claro! A Luna pode chegar às 10h30.',ultimo_remetente:'loja',ultimo_ts:Date.now()-1000*60*55,nao_lidas:0},
+    {id:'c3',nome:'Patrícia Souza',pet:'Bidu',emoji:'🐩',ultima:'🤖 Seu agendamento foi confirmado para hoje às 14h.',ultimo_remetente:'bot',ultimo_ts:Date.now()-1000*60*60*3,nao_lidas:1}
+  ],
+  mensagens:{
+    c1:[
+      {remetente:'cliente',texto:'Oi! Gostaria de confirmar o banho do Thor amanhã.',ts:Date.now()-1000*60*60*2},
+      {remetente:'bot',texto:'Olá Mariana! O agendamento do Thor está confirmado para amanhã às 09h. 🐶',ts:Date.now()-1000*60*60*2+1000*30},
+      {remetente:'loja',texto:'Oi Mariana, tudo certo! Vamos buscar o Thor no leva-e-traz às 8h30.',ts:Date.now()-1000*60*15},
+      {remetente:'cliente',texto:'Perfeito, obrigada! Até amanhã 😊',ts:Date.now()-1000*60*8}
+    ],
+    c2:[
+      {remetente:'cliente',texto:'A Luna pode ir mais tarde hoje?',ts:Date.now()-1000*60*60},
+      {remetente:'loja',texto:'Claro! A Luna pode chegar às 10h30.',ts:Date.now()-1000*60*55}
+    ],
+    c3:[
+      {remetente:'cliente',texto:'Bom dia, o Bidu está agendado pra hoje?',ts:Date.now()-1000*60*60*3-1000*60},
+      {remetente:'bot',texto:'Seu agendamento foi confirmado para hoje às 14h.',ts:Date.now()-1000*60*60*3}
+    ]
+  }
+};
+function _isDemo(){return _authDemoMode===true;}
+function authDemo(){
+  _authDemoMode=true;
+  try{localStorage.setItem(AUTH_DEMO_KEY,'1');}catch(_){}
+  if(typeof showCRMApp==='function')showCRMApp();
+  try{renderAll&&renderers.dash();}catch(_){}
+  try{
+    const pill=$('sessPill');
+    if(pill){pill.style.display='flex';const nm=$('sessNm');if(nm)nm.textContent='Demonstração';const rl=$('sessRl');if(rl)rl.textContent='Modo demo';}
+  }catch(_){}
+  toast('Modo demonstração ativado — dados locais <span class=msi>science</span>');
+  try{maybeStartCRMTour(true);}catch(_){}
+}
+/* Renderiza a faixa "Vindos do App" na Agenda com dados mock (modo demo). */
+function demoRenderAgenda(){
+  const host=$('agenda');if(!host||!host.classList.contains('on'))return;
+  let box=$('appAgendaBox');
+  if(!box){box=document.createElement('div');box.id='appAgendaBox';box.style.cssText='margin-bottom:14px';host.insertBefore(box,host.firstChild);}
+  const rows=DEMO_DATA.agendamentos;
+  const linhas=rows.map(a=>`<tr>
+      <td data-label="Data"><b>${esc(fmtDate(a.data))}</b></td>
+      <td data-label="Hora"><b>${esc(a.hora||'')}</b>${a.leva_traz?' <span class=msi title="Leva & Traz" style="color:var(--accent-2);font-size:16px">local_shipping</span>':''}</td>
+      <td data-label="Pet">${esc(a.pet||'?')}</td>
+      <td data-label="Tutor">${esc(a.cliente||'')}</td>
+      <td data-label="Serviço">${esc(a.servico||'')}</td>
+      <td data-label="Status">${statusTag(a.status||'Aguardando')} <span class="tag t-cinza" title="Criado pelo cliente no app PetNexus">app</span></td>
+    </tr>`).join('');
+  box.innerHTML=`<div class="card" style="padding:8px 14px;border:1.5px solid var(--accent)">
+    <div style="display:flex;align-items:center;gap:8px;margin:6px 2px 8px">
+      <span class=msi style="color:var(--accent)">smartphone</span>
+      <b>📱 Vindos do App</b>
+      <span style="color:var(--muted);font-size:.82rem">· ${rows.length} agendamentos (demonstração)</span></div>
+    <table><thead><tr><th>Data</th><th>Hora</th><th>Pet</th><th>Tutor</th><th>Serviço</th><th>Status</th></tr></thead>
+    <tbody>${linhas}</tbody></table></div>`;
+}
+/* Renderiza a faixa "Conversas do App" em Mensagens com dados mock (modo demo). */
+function demoRenderMsg(){
+  const host=$('msg');if(!host||!host.classList.contains('on'))return;
+  let box=$('appMsgBox');
+  if(!box){box=document.createElement('div');box.id='appMsgBox';box.style.cssText='margin-bottom:14px';host.insertBefore(box,host.firstChild);}
+  const convs=DEMO_DATA.conversas;
+  const itens=convs.map(c=>{
+    const naoLidas=+c.nao_lidas||0;
+    const prev=c.ultima?((c.ultimo_remetente==='loja'?'':c.ultimo_remetente==='bot'?'':''))+(c.ultima||''):'';
+    const ic=(c.emoji&&!/^[a-z_]+$/.test(c.emoji))?esc(c.emoji):'<span class=msi>pets</span>';
+    const nm=(c.nome||'Cliente').replace(/'/g,'’'),pt=(c.pet||'').replace(/'/g,'’');
+    return `<div class="conv" style="cursor:pointer" onclick="abrirConversaApp('${esc(c.id)}','${esc(nm)}','${esc(pt)}')">
+      <div class="cav">${ic}</div>
+      <div class="cmid"><div class="cnm">${esc(c.nome||'Cliente')} <span style="font-weight:500;color:var(--muted);font-size:.78rem">· ${esc(c.pet||'')}</span> <span class="tag t-cinza" style="font-size:.62rem">app</span></div>
+        <div class="cpv">${esc(prev)}</div></div>
+      <div class="cend"><span class="ctm">${c.ultimo_ts?chatTime(c.ultimo_ts):''}</span>${naoLidas?`<span class="cunr">${naoLidas}</span>`:''}</div>
+    </div>`;
+  }).join('');
+  box.innerHTML=`<div class="card" style="padding:8px 10px;border:1.5px solid var(--accent)">
+    <div style="display:flex;align-items:center;gap:8px;margin:6px 6px 8px">
+      <span class=msi style="color:var(--accent)">smartphone</span>
+      <b>📱 Conversas do App</b>
+      <span style="color:var(--muted);font-size:.82rem">· ${convs.length} conversas (demonstração)</span></div>
+    <div class="clbody">${itens}</div></div>`;
+}
+
+/* Busca agendamentos do Supabase e injeta uma faixa no topo da view Agenda. */
+async function syncAgendamentosApp(){
+  if(_isDemo()){try{demoRenderAgenda();}catch(_){}return;}
+  try{
+    if(!_pnAppReady())return;
+    const host=$('agenda');
+    if(!host||!host.classList.contains('on'))return;
+    let rows=[];
+    try{ rows=await PND().staffAgendamentos()||[]; }
+    catch(e){ console.error('[PetNexus] staffAgendamentos falhou',e); toast('Não consegui carregar agendamentos do app <span class=msi>error</span>'); return; }
+    let box=$('appAgendaBox');
+    if(!box){
+      box=document.createElement('div');
+      box.id='appAgendaBox';
+      box.style.cssText='margin-bottom:14px';
+      host.insertBefore(box,host.firstChild);
+    }
+    if(!rows.length){
+      box.innerHTML=`<div class="card" style="padding:10px 14px;border:1.5px dashed var(--border)">
+        <div style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.86rem">
+          <span class=msi style="color:var(--accent)">smartphone</span>
+          <b style="color:var(--text)">📱 Vindos do App</b> · nenhum agendamento sincronizado</div></div>`;
+      return;
+    }
+    const linhas=rows.map(a=>{
+      return `<tr>
+        <td data-label="Data"><b>${esc(fmtDate(a.data))}</b></td>
+        <td data-label="Hora"><b>${esc(a.hora||'')}</b>${a.leva_traz?' <span class=msi title="Leva & Traz" style="color:var(--accent-2);font-size:16px">local_shipping</span>':''}</td>
+        <td data-label="Pet">${esc(a.pet||'?')}</td>
+        <td data-label="Tutor">${esc(a.cliente||'')}</td>
+        <td data-label="Serviço">${esc(a.servico||'')}</td>
+        <td data-label="Status">${statusTag(a.status||'Aguardando')} <span class="tag t-cinza" title="Criado pelo cliente no app PetNexus">app</span></td>
+      </tr>`;
+    }).join('');
+    box.innerHTML=`<div class="card" style="padding:8px 14px;border:1.5px solid var(--accent)">
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 2px 8px">
+        <span class=msi style="color:var(--accent)">smartphone</span>
+        <b>📱 Vindos do App</b>
+        <span style="color:var(--muted);font-size:.82rem">· ${rows.length} agendamento${rows.length>1?'s':''} sincronizado${rows.length>1?'s':''} do Supabase</span></div>
+      <table><thead><tr><th>Data</th><th>Hora</th><th>Pet</th><th>Tutor</th><th>Serviço</th><th>Status</th></tr></thead>
+      <tbody>${linhas}</tbody></table></div>`;
+  }catch(e){console.warn('[PetNexus] syncAgendamentosApp falhou (modo local mantido):',e);}
+}
+/* Busca conversas+mensagens do Supabase e injeta uma faixa no topo da view Mensagens. */
+async function syncMensagensApp(){
+  if(_isDemo()){try{demoRenderMsg();}catch(_){}return;}
+  try{
+    if(!_pnAppReady())return;
+    const host=$('msg');
+    if(!host||!host.classList.contains('on'))return;
+    let convs=[];
+    try{ convs=await PND().staffConversas()||[]; }
+    catch(e){ console.error('[PetNexus] staffConversas falhou',e); toast('Não consegui carregar conversas do app <span class=msi>error</span>'); return; }
+    let box=$('appMsgBox');
+    if(!box){
+      box=document.createElement('div');
+      box.id='appMsgBox';
+      box.style.cssText='margin-bottom:14px';
+      host.insertBefore(box,host.firstChild);
+    }
+    if(!convs.length){
+      box.innerHTML=`<div class="card" style="padding:10px 14px;border:1.5px dashed var(--border)">
+        <div style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.86rem">
+          <span class=msi style="color:var(--accent)">smartphone</span>
+          <b style="color:var(--text)">📱 Conversas do App</b> · nenhuma conversa sincronizada</div></div>`;
+      return;
+    }
+    const itens=convs.map(c=>{
+      const naoLidas=+c.nao_lidas||0;
+      const prev=c.ultima?((c.ultimo_remetente==='loja'?'Você: ':c.ultimo_remetente==='bot'?'🤖 ':''))+(c.ultima||''):'';
+      const ic=(c.emoji&&!/^[a-z_]+$/.test(c.emoji))?esc(c.emoji):'<span class=msi>pets</span>';
+      const nm=(c.nome||'Cliente').replace(/'/g,'’'), pt=(c.pet||'').replace(/'/g,'’');
+      return `<div class="conv" style="cursor:pointer" onclick="abrirConversaApp('${esc(c.id)}','${esc(nm)}','${esc(pt)}')">
+        <div class="cav">${ic}</div>
+        <div class="cmid"><div class="cnm">${esc(c.nome||'Cliente')} <span style="font-weight:500;color:var(--muted);font-size:.78rem">· ${esc(c.pet||'')}</span> <span class="tag t-cinza" style="font-size:.62rem" title="Conversa do app PetNexus">app</span></div>
+          <div class="cpv">${esc(prev)}</div></div>
+        <div class="cend"><span class="ctm">${c.ultimo_ts?chatTime(new Date(c.ultimo_ts).getTime()):''}</span>${naoLidas?`<span class="cunr">${naoLidas}</span>`:''}</div>
+      </div>`;
+    }).join('');
+    box.innerHTML=`<div class="card" style="padding:8px 10px;border:1.5px solid var(--accent)">
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 6px 8px">
+        <span class=msi style="color:var(--accent)">smartphone</span>
+        <b>📱 Conversas do App</b>
+        <span style="color:var(--muted);font-size:.82rem">· ${convs.length} conversa${convs.length>1?'s':''} sincronizada${convs.length>1?'s':''} do Supabase</span></div>
+      <div class="clbody">${itens}</div></div>`;
+  }catch(e){console.warn('[PetNexus] syncMensagensApp falhou (modo local mantido):',e);}
+}
+/* Abre uma conversa do app: mostra o histórico e permite RESPONDER o cliente. */
+async function abrirConversaApp(id,nome,pet){
+  if(!_isDemo()&&!_pnAppReady())return toast('Faça login para ver as conversas do app');
+  modal(`<h3>${esc(nome||'Cliente')} ${pet?'<span style="font-weight:500;color:var(--muted);font-size:.82rem">· '+esc(pet)+'</span>':''}</h3>
+    <div class="msub" style="margin-bottom:8px"><span class="tag t-cinza" style="font-size:.62rem">conversa do app PetNexus</span></div>
+    <div id="appConvBody" style="max-height:46vh;overflow-y:auto;margin:4px 0 12px;display:flex;flex-direction:column;gap:8px;padding:4px">
+      <div class="empty"><span class="em-ic msi">hourglass_empty</span>Carregando…</div></div>
+    <div class="fld"><textarea id="appConvTxt" placeholder="Escreva uma resposta para o cliente…" rows="2"></textarea></div>
+    <div class="acts"><button class="btn btn-s" onclick="closeM()">Fechar</button>
+      <button class="btn btn-p" id="appConvSend"><span class=msi>send</span> Responder</button></div>`,true);
+  async function carregar(){
+    try{
+      const ms=_isDemo()?(DEMO_DATA.mensagens[id]||[]):(await PND().staffMensagens(id)||[]);
+      const body=$('appConvBody');if(!body)return;
+      if(!ms.length){body.innerHTML='<div class="empty" style="padding:18px">Sem mensagens nesta conversa.</div>';}
+      else{
+        body.innerHTML=ms.map(m=>{
+          const mine=(m.remetente==='loja'),bot=(m.remetente==='bot');
+          const al=mine?'flex-end':'flex-start';
+          const bg=mine?'var(--accent)':'var(--surface-2)';
+          const col=mine?'#fff':'var(--text)';
+          return `<div style="align-self:${al};max-width:82%;background:${bg};color:${col};padding:8px 11px;border-radius:13px;font-size:.88rem;line-height:1.4">
+            ${bot?'🤖 ':''}${esc(m.texto||'')}
+            <div style="font-size:.62rem;opacity:.7;margin-top:3px;text-align:right">${m.ts?chatTime(new Date(m.ts).getTime()):''}</div></div>`;
+        }).join('');
+        body.scrollTop=body.scrollHeight;
+      }
+      if(!_isDemo()){try{await PND().staffMarcarLidas(id);}catch(_){}}
+    }catch(e){console.error('[PetNexus] staffMensagens falhou',e);const body=$('appConvBody');if(body)body.innerHTML='<div class="empty" style="padding:18px">Erro ao carregar as mensagens.</div>';}
+  }
+  await carregar();
+  const send=$('appConvSend');
+  if(send)send.onclick=async()=>{
+    const ta=$('appConvTxt');const txt=(ta&&ta.value||'').trim();
+    if(!txt)return;
+    send.disabled=true;
+    try{
+      if(_isDemo()){
+        (DEMO_DATA.mensagens[id]=DEMO_DATA.mensagens[id]||[]).push({remetente:'loja',texto:txt,ts:Date.now()});
+        const c=DEMO_DATA.conversas.find(x=>x.id===id);
+        if(c){c.ultima='Você: '+txt;c.ultimo_remetente='loja';c.ultimo_ts=Date.now();c.nao_lidas=0;}
+        if(ta)ta.value='';
+        await carregar();syncMensagensApp();
+        toast('Resposta enviada (demo) <span class=msi>check</span>');
+      }else{
+        await PND().staffResponder(id,txt);
+        if(ta)ta.value='';
+        await carregar();
+        syncMensagensApp();
+      }
+    }catch(e){console.error('[PetNexus] staffResponder falhou',e);toast('Falha ao enviar resposta <span class=msi>error</span>');}
+    finally{send.disabled=false;}
+  };
+}
 function avancar(id){const a=DB.agenda.find(x=>x.id===id);const fl=['Aguardando','Em andamento','Concluído'],i=fl.indexOf(a.status);if(i<2){a.status=fl[i+1];persist();renderers.agenda();const p=petById(a.petId);toast(`${esc(p?p.nome:'')}: ${a.status} <span class=msi>check</span>`);}}
 function openAgenda(preCli,preData){
   const cliOpts=DB.clientes.flatMap(c=>(c.pets||[]).map(p=>`<option value="${p.id}" ${preCli===c.id?'selected':''}>${esc(p.nome)} — ${esc(c.nome)}</option>`)).join('');
@@ -1164,6 +1417,8 @@ function openAgenda(preCli,preData){
 }
 function saveAg(){
   const petId=$('a_pet').value,c=cliOfPet(petId),s=servById($('a_serv').value);
+  if(!c||!s)return toast('Cadastre ao menos um cliente (com pet) e um serviço antes de agendar');
+  if(!$('a_data').value||!$('a_hora').value)return toast('Informe data e horário');
   DB.agenda.push({id:'a'+uid(),data:$('a_data').value,hora:$('a_hora').value,dur:s.dur,petId,cliId:c.id,servId:s.id,profId:$('a_prof').value,obs:$('a_obs').value.trim(),levaTraz:$('a_lt').checked,status:'Aguardando',osId:null});
   persist();agFiltro.data=$('a_data').value;closeM();renderers.agenda();toast('Agendamento criado <span class=msi>check</span>');
   const _ag=DB.agenda[DB.agenda.length-1];const _p=petById(_ag.petId);
@@ -1201,7 +1456,7 @@ function reagendar(id){const a=DB.agenda.find(x=>x.id===id);
    <div class="f2"><div class="fld"><label>Data</label><input id="r_data" type="date" value="${a.data}"></div>
    <div class="fld"><label>Horário</label><input id="r_hora" type="time" value="${a.hora}"></div></div>
    <div class="acts"><button class="btn btn-s" onclick="closeM()">Cancelar</button><button class="btn btn-p" onclick="doReagendar('${id}')">Salvar</button></div>`);}
-function doReagendar(id){const a=DB.agenda.find(x=>x.id===id);a.data=$('r_data').value;a.hora=$('r_hora').value;a.status='Aguardando';persist();closeM();agFiltro.data=a.data;renderers.agenda();if($('drawer').classList.contains('on'))openAgDetail(id);toast('Reagendado <span class=msi>check</span>');}
+function doReagendar(id){const a=DB.agenda.find(x=>x.id===id);if(!a)return;if(!$('r_data').value||!$('r_hora').value)return toast('Informe data e horário');a.data=$('r_data').value;a.hora=$('r_hora').value;a.status='Aguardando';persist();closeM();agFiltro.data=a.data;renderers.agenda();if($('drawer').classList.contains('on'))openAgDetail(id);toast('Reagendado <span class=msi>check</span>');}
 function gerarOSagenda(id){
   const a=DB.agenda.find(x=>x.id===id);const s=servById(a.servId);
   const os={id:'os'+uid(),cliId:a.cliId,petId:a.petId,profId:a.profId,data:a.data,status:'Pronta',pago:'',
@@ -2037,6 +2292,11 @@ renderers.config=function(){
   const integs=[['whatsapp','chat','WhatsApp Business API','Lembretes e confirmações automáticas'],['pagamento','credit_card','Gateway Pix / Cartão','Pagamentos online e no PDV'],['nfe','receipt_long','NF-e / SEFAZ','Emissão fiscal automática'],['app','smartphone','App PetNexus Clube','Sincronização cliente ↔ CRM'],['analytics','insights','Analytics / Pixel','Marketing e captação de leads']];
   $('config').innerHTML=`
    <div class="sec-head"><h2>Configurações</h2></div>
+   <div class="card" style="margin-bottom:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+     <div class="petav" style="border:none;background:var(--surface-2);color:var(--accent-2)"><span class=msi>school</span></div>
+     <div style="flex:1;min-width:160px"><b style="font-size:.92rem">Tutorial guiado</b><br><span style="font-size:.8rem;color:var(--muted)">Reveja a apresentação das áreas principais do sistema.</span></div>
+     <button class="btn btn-p btn-sm" onclick="replayCRMTour()"><span class=msi>play_circle</span> Ver tutorial novamente</button>
+   </div>
    <div class="grid2b">
      <div class="card"><h3>Perfil do negócio</h3><div class="cap">Dados da unidade</div>
        <div class="f2"><div class="fld"><label>Nome</label><input id="b_nome" value="${esc(b.nome)}"></div>
@@ -2555,10 +2815,16 @@ function botTaskBase(convId,msg,intent){
 }
 
 /* ---- TAREFA FINAL DE AGENDAMENTO (a partir dos dados coletados no diálogo) ---- */
+function botProfLivre(data,hora,dur,profId){
+  const ini=hhmmToMin(hora),fim=ini+(dur||40);
+  return !DB.agenda.some(a=>a.data===data&&a.status!=='Cancelado'&&a.profId===profId&&ini<(hhmmToMin(a.hora)+(a.dur||40))&&fim>hhmmToMin(a.hora));
+}
 function botBuildAgendarTask(convId,msg,data){
   const base=botTaskBase(convId,msg,'agendar');
   const s=servById(data.servId)||DB.servicos.find(x=>x.id===data.servId);
-  const prof=(DB.profissionais.filter(p=>p.ativo)[0]||{}).id||null;
+  const ativos=DB.profissionais.filter(p=>p.ativo);
+  const profLivre=ativos.find(p=>botProfLivre(data.data,data.hora,s?(s.dur||40):40,p.id));
+  const prof=(profLivre||ativos[0]||{}).id||null;
   const nome=base.cliNome.split(' ')[0];
   return {...base,kind:'agendar',servId:s.id,servNome:s.nome,preco:s.preco,qtd:1,
     data:data.data,hora:data.hora,profId:prof,
@@ -2569,7 +2835,7 @@ function botBuildAgendarTask(convId,msg,data){
 /* ---- TAREFA FINAL DE COMPRA (a partir dos dados coletados no diálogo) ---- */
 function botBuildCompraTask(convId,msg,data){
   const base=botTaskBase(convId,msg,'compra');
-  const prod=prodById(data.prodId)||DB.produtos.find(x=>x.id===data.prodId);
+  const prod=prodById(data.prodId)||DB.produtos.find(x=>x.id===data.prodId)||{id:data.prodId,nome:'produto',preco:0};
   const qtd=Math.max(1,+data.qtd||1);
   const modo=data.modo||'retirada';
   const total=prod.preco*qtd;
@@ -3098,7 +3364,7 @@ function botNotify(){
 /* ---- CONTROLES (toggle + modo) ---- */
 function botToggle(on){
   DB.bot.on=on;
-  if(on){DB.bot.since=Date.now();}  // só processa mensagens a partir de agora (opt-in)
+  if(on){DB.bot.since=0;}  // processa também mensagens pendentes não respondidas; DB.bot.seen evita reprocesso/loop
   botSave();renderers.msg();
   toast(on?'🤖 Atendimento automático ligado':'Atendimento automático desligado');
   if(on)setTimeout(botProcess,100);
@@ -3730,6 +3996,7 @@ renderers.entregas=function(){
   $('entregas').innerHTML=`
    <div class="sec-head"><h2>Entregas ao vivo</h2>
      <div class="right">${autoSwitch}
+       ${(typeof frotaOK==='function'&&frotaOK())?`<button class="btn btn-p" onclick="frotaNovaEntrega()"><span class=msi>add</span> Nova entrega</button>`:''}
        <button class="btn btn-s" onclick="entFit()"><span class=msi>my_location</span> Enquadrar frota</button>
      </div></div>
    <div class="mini">
@@ -3815,6 +4082,189 @@ function entViewLeave(){
 }
 /* Atualiza os tiles do mapa ao trocar tema */
 (function(){new MutationObserver(()=>{if(entTiles&&entMap)entTiles.setUrl(entTileURL());}).observe(root,{attributes:true,attributeFilter:['data-theme']});})();
+
+/* ===================================================================== */
+/* ===== FROTA / ENTREGADORES (Supabase via PetNexusData) ============= */
+/* Gestão da frota: aprovação de entregadores e despacho de corridas.
+   Exige login como staff/admin (PetNexusData.available()). Sem login,
+   exibe um aviso amigável e não bloqueia o restante do CRM. */
+const PND=()=>window.PetNexusData||null;
+function frotaOK(){const D=PND();return !!(D&&D.available&&D.available());}
+let frotaTab='pendentes';
+
+renderers.frota=function(){
+  const sec=$('frota');if(!sec)return;
+  // Sem login de equipe -> aviso amigável (não bloqueia o resto do CRM)
+  if(!frotaOK()){
+    sec.innerHTML=`
+     <div class="sec-head"><h2>Frota / Entregadores</h2></div>
+     <div class="ent-warn"><span class=msi>lock</span><div><b>Faça login para gerenciar a frota.</b><br>
+       Entre como equipe na seção <a href="#" onclick="go('equipe');return false" style="color:var(--accent-2);font-weight:600">Equipe &amp; Acessos</a> para aprovar entregadores e despachar entregas.</div></div>`;
+    return;
+  }
+  sec.innerHTML=`
+   <div class="sec-head"><h2>Frota / Entregadores</h2>
+     <div class="right">
+       <button class="btn btn-p" onclick="frotaNovaEntrega()"><span class=msi>add</span> Nova entrega</button>
+     </div></div>
+   <div class="ent-warn" style="background:color-mix(in srgb,var(--accent) 8%,transparent);border-color:color-mix(in srgb,var(--accent) 22%,transparent)"><span class=msi>info</span>
+     <div>A corrida criada em <b>Nova entrega</b> vai para a frota aprovada e o entregador certo aceita: <b>moto</b> recebe até <b>15&nbsp;kg</b>, <b>carro</b> recebe qualquer peso. O código de confirmação é gerado automaticamente e a loja nunca o vê.</div></div>
+   <div class="chips" style="margin-bottom:18px">
+     <button class="chip ${frotaTab==='pendentes'?'on':''}" onclick="frotaSetTab('pendentes')">Pendentes</button>
+     <button class="chip ${frotaTab==='aprovados'?'on':''}" onclick="frotaSetTab('aprovados')">Aprovados</button>
+   </div>
+   <div id="frotaList"><div class="empty"><span class="em-ic msi">hourglass_empty</span>Carregando…</div></div>`;
+  frotaLoad();
+};
+function frotaSetTab(t){frotaTab=t;renderers.frota();}
+function frotaStars(n){
+  const v=Math.round((+n||0));
+  let s='';for(let i=1;i<=5;i++)s+=`<span class="msi" style="font-size:1rem;color:${i<=v?'var(--amarelo)':'var(--hair)'}">star</span>`;
+  return `<span style="display:inline-flex;align-items:center;gap:1px;vertical-align:middle">${s}</span>`;
+}
+async function frotaLoad(){
+  const box=$('frotaList');if(!box)return;
+  if(!frotaOK()){renderers.frota();return;}
+  try{
+    if(frotaTab==='pendentes'){
+      const lista=await PND().staffEntregadores('pendente')||[];
+      if(!lista.length){box.innerHTML=`<div class="empty"><span class="em-ic msi">how_to_reg</span>Nenhum entregador aguardando aprovação.</div>`;return;}
+      box.innerHTML=`<div class="grid2b">${lista.map(frotaCardPendente).join('')}</div>`;
+    }else{
+      const lista=await PND().staffEntregadores('aprovado')||[];
+      if(!lista.length){box.innerHTML=`<div class="empty"><span class="em-ic msi">two_wheeler</span>Nenhum entregador aprovado ainda.</div>`;return;}
+      box.innerHTML=`<div class="grid2b">${lista.map(frotaCardAprovado).join('')}</div>`;
+    }
+  }catch(e){console.error(e);box.innerHTML=`<div class="empty"><span class="em-ic msi">error</span>Não foi possível carregar a frota.</div>`;toast('Erro ao carregar a frota <span class=msi>error</span>');}
+}
+function frotaVeic(e){
+  const ico=e.tipo_veiculo==='carro'?'directions_car':'two_wheeler';
+  const tp=e.tipo_veiculo==='carro'?'Carro':'Moto';
+  const det=[e.veiculo_modelo,e.veiculo_placa].filter(Boolean).map(esc).join(' · ');
+  return `<span class="msi" style="vertical-align:middle">${ico}</span> ${tp}${det?' · '+det:''}`;
+}
+function frotaCardPendente(e){
+  const docsTag=e.docs_enviados
+    ? `<span class="tag t-verde" style="font-size:.66rem"><span class="msi" style="font-size:13px;vertical-align:middle">verified</span> Documentos enviados</span>`
+    : `<span class="tag t-cinza" style="font-size:.66rem;background:rgba(120,120,128,.16)">Sem documentos</span>`;
+  return `<div class="card">
+    <div class="list-row" style="border:none;padding:0 0 6px;align-items:flex-start">
+      <div style="display:flex;align-items:center;gap:11px">${avIni(e.nome_completo||'?')}
+        <span><b>${esc(e.nome_completo||'Sem nome')}</b><br><span style="font-size:.8rem;color:var(--muted)">CPF ${esc(e.cpf||'—')}</span></span></div>
+      <span class="tag t-amar">Pendente</span>
+    </div>
+    <div style="font-size:.86rem;color:var(--muted);line-height:1.8;margin:8px 0 4px">
+      <div>${frotaVeic(e)}</div>
+      <div><span class="msi" style="vertical-align:middle">badge</span> CNH ${esc(e.cnh||'—')}</div>
+      ${e.nome_mae?`<div><span class="msi" style="vertical-align:middle">family_restroom</span> Mãe: ${esc(e.nome_mae)}</div>`:''}
+      ${e.telefone?`<div><span class="msi" style="vertical-align:middle">call</span> ${esc(e.telefone)}</div>`:''}
+    </div>
+    <div style="margin:6px 0 0">${docsTag}</div>
+    <div class="acts" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-s btn-sm" onclick="frotaVerDocumentos('${esc(e.id)}','${esc((e.nome_completo||'').replace(/'/g,''))}')"><span class=msi>image</span> Ver documentos</button>
+      <button class="btn btn-danger btn-sm" onclick="frotaRejeitar('${esc(e.id)}')"><span class=msi>close</span> Rejeitar</button>
+      <button class="btn btn-p btn-sm" onclick="frotaAprovar('${esc(e.id)}')"><span class=msi>check</span> Aprovar</button>
+    </div></div>`;
+}
+async function frotaVerDocumentos(id,nome){
+  if(!frotaOK())return toast('Faça login para gerenciar a frota');
+  modal(`<h3>Documentos${nome?' — '+esc(nome):''}</h3>
+    <div id="docsBody" class="msub">Carregando documentos…</div>
+    <div class="acts"><button class="btn btn-s" onclick="closeM()">Fechar</button></div>`,true);
+  try{
+    const d=await PND().staffEntregadorDocumentos(id);
+    const body=$('docsBody');if(!body)return;
+    if(!d){body.innerHTML='Este entregador ainda não enviou documentos.';return;}
+    const tipo=(d.doc_tipo==='rg')?'RG / CIN':'CPF';
+    const itens=[
+      ['foto_doc_frente','Documento — frente'],
+      ['foto_doc_verso','Documento — verso'],
+      ['foto_selfie','Selfie com documento'],
+      ['foto_cnh','CNH'],
+      ['foto_veiculo','Veículo']
+    ].filter(x=>d[x[0]]);
+    let h=`<div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Tipo de identidade: <b style="color:var(--text)">${tipo}</b>${d.doc_numero?' · Nº '+esc(d.doc_numero):''}</div>`;
+    if(!itens.length){h+='<div style="color:var(--muted)">Nenhuma foto foi enviada.</div>';}
+    else{
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+itens.map(x=>
+        `<div style="border:1px solid var(--line,rgba(0,0,0,.1));border-radius:12px;overflow:hidden;background:var(--surface-2,#f3f4f6)">
+           <img src="${d[x[0]]}" alt="${x[1]}" style="width:100%;height:140px;object-fit:cover;display:block;cursor:zoom-in;background:#fff" onclick="window.open(this.src,'_blank')">
+           <small style="display:block;padding:6px 9px;font-size:.7rem;font-weight:700;color:var(--muted)">${x[1]}</small>
+         </div>`).join('')+'</div>'
+        +`<div style="font-size:.74rem;color:var(--muted);margin-top:9px"><span class="msi" style="font-size:13px;vertical-align:middle">touch_app</span> Toque numa foto para abrir em tamanho grande.</div>`;
+    }
+    body.innerHTML=h;
+  }catch(e){console.error(e);const body=$('docsBody');if(body)body.innerHTML='Não foi possível carregar os documentos.';}
+}
+function frotaCardAprovado(e){
+  return `<div class="card">
+    <div class="list-row" style="border:none;padding:0 0 6px;align-items:flex-start">
+      <div style="display:flex;align-items:center;gap:11px">${avIni(e.nome_completo||'?')}
+        <span><b>${esc(e.nome_completo||'Sem nome')}</b><br><span style="font-size:.8rem;color:var(--muted)">${frotaVeic(e)}</span></span></div>
+      <span class="tag t-verde">Aprovado</span>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:.86rem;color:var(--muted);margin-top:10px">
+      <div>${frotaStars(e.avaliacao_media)} <span style="font-variant-numeric:tabular-nums">${(+e.avaliacao_media||0).toFixed(1)}</span></div>
+      <div><span class="msi" style="vertical-align:middle">local_shipping</span> ${(+e.total_entregas||0)} entregas</div>
+      <div><span class="msi" style="vertical-align:middle">payments</span> ${money(e.ganhos_total||0)}</div>
+    </div></div>`;
+}
+async function frotaAprovar(id){
+  if(!frotaOK())return toast('Faça login para gerenciar a frota');
+  try{
+    await PND().staffAprovar(id,true);
+    toast('Entregador aprovado <span class=msi>check</span>');
+    frotaLoad();
+  }catch(e){console.error(e);toast('Falha ao aprovar entregador <span class=msi>error</span>');}
+}
+function frotaRejeitar(id){
+  if(!frotaOK())return toast('Faça login para gerenciar a frota');
+  modal(`<h3>Rejeitar entregador</h3><div class="msub">Informe o motivo da rejeição. Ele poderá ser exibido ao entregador.</div>
+    <div class="fld"><label>Motivo</label><textarea id="frj_mot" placeholder="Ex: documentação incompleta / CNH ilegível..."></textarea></div>
+    <div class="acts"><button class="btn btn-s" onclick="closeM()">Cancelar</button><button class="btn btn-danger solid" id="frjBtn"><span class=msi>close</span> Rejeitar</button></div>`);
+  setTimeout(()=>{const i=$('frj_mot');if(i)i.focus();},80);
+  $('frjBtn').onclick=async()=>{
+    const mot=($('frj_mot').value||'').trim();
+    if(!mot)return toast('Informe o motivo da rejeição');
+    $('frjBtn').disabled=true;
+    try{
+      await PND().staffAprovar(id,false,mot);
+      closeM();toast('Entregador rejeitado');
+      frotaLoad();
+    }catch(e){console.error(e);$('frjBtn').disabled=false;toast('Falha ao rejeitar entregador <span class=msi>error</span>');}
+  };
+}
+function frotaNovaEntrega(){
+  if(!frotaOK())return toast('Faça login para gerenciar a frota');
+  modal(`<h3>Nova entrega</h3><div class="msub">A corrida vai para a frota aprovada e o entregador certo aceita: <b>moto até 15&nbsp;kg</b>, <b>carro acima disso</b>. O código de confirmação é gerado automaticamente.</div>
+   <div class="f3">
+     <div class="fld"><label>Tipo</label><select id="ne_tipo"><option value="entrega">Entrega</option><option value="coleta">Coleta</option></select></div>
+     <div class="fld"><label>Peso (kg)</label><input id="ne_peso" type="number" min="0" step="0.1" placeholder="Ex: 8"></div>
+     <div class="fld"><label>Valor (R$)</label><input id="ne_valor" type="number" min="0" step="0.01" placeholder="Opcional"></div>
+   </div>
+   <div class="fld"><label>Origem</label><input id="ne_origem" value="PetNexus Loja" placeholder="Endereço de coleta"></div>
+   <div class="fld"><label>Destino</label><input id="ne_destino" placeholder="Endereço de entrega"></div>
+   <div class="fld"><label>Pet (opcional, p/ coleta)</label><input id="ne_pet" placeholder="Ex: Rex"></div>
+   <div class="acts"><button class="btn btn-s" onclick="closeM()">Cancelar</button><button class="btn btn-p" id="neBtn"><span class=msi>send</span> Despachar</button></div>`);
+  setTimeout(()=>{const i=$('ne_destino');if(i)i.focus();},80);
+  $('neBtn').onclick=async()=>{
+    const tipo=$('ne_tipo').value;
+    const peso=+$('ne_peso').value||null;
+    const valor=+$('ne_valor').value||null;
+    const origem=($('ne_origem').value||'').trim()||'PetNexus Loja';
+    const destino=($('ne_destino').value||'').trim();
+    const petNome=($('ne_pet').value||'').trim()||null;
+    if(!destino)return toast('Informe o destino da entrega');
+    $('neBtn').disabled=true;
+    try{
+      // Coordenadas ficam nulas por enquanto (sem geocoding); enviamos só o que temos.
+      await PND().staffDespachar({tipo,pesoKg:peso,origem,destino,petNome,valor,
+        origemLat:null,origemLng:null,destinoLat:null,destinoLng:null});
+      closeM();
+      toast('Corrida despachada para a frota <span class=msi>local_shipping</span>');
+    }catch(e){console.error(e);$('neBtn').disabled=false;toast('Falha ao despachar entrega <span class=msi>error</span>');}
+  };
+}
 
 /* ===================================================================== */
 /* ===== EQUIPE & ACESSOS (Firebase -> Supabase) ===================== */
@@ -3931,14 +4381,12 @@ function eqLoginCard(){
   return `<div class="eq-state">
      <div class="eq-ic"><span class=msi>badge</span></div>
      <h3>Entrar no CRM</h3>
-     <p>Acesso restrito à equipe. Entre com seu e-mail e senha ou com o Google.</p>
+     <p>Acesso restrito à equipe. Entre com seu e-mail e senha.</p>
      <form class="eq-form" id="eqLoginForm" style="margin-top:18px" autocomplete="on">
        <div class="fld"><label for="eqEmail">E-mail</label><input type="email" id="eqEmail" autocomplete="username" placeholder="voce@petshop.com" required></div>
        <div class="fld"><label for="eqSenha">Senha</label><input type="password" id="eqSenha" autocomplete="current-password" placeholder="Sua senha" required></div>
        <button class="btn btn-p" type="submit" id="eqLoginBtn" style="width:100%;justify-content:center"><span class=msi>login</span> Entrar</button>
      </form>
-     <div class="eq-or">ou</div>
-     <button class="btn btn-s" onclick="eqLoginGoogle()" style="width:100%;justify-content:center"><span class=msi>account_circle</span> Entrar com Google</button>
      <div style="margin-top:16px"><button class="btn btn-s btn-sm" onclick="eqResetSenha()" style="background:none;border:none;color:var(--accent-2)">Esqueci minha senha</button></div>
    </div>`;
 }
@@ -3972,10 +4420,15 @@ async function eqResetSenha(){
   };
 }
 async function eqLogout(){
-  const ok=await uiConfirm('Deseja sair da sua conta da equipe?',{titulo:'Sair',icon:'logout',ok:'Sair'});
+  const ok=await uiConfirm(_isDemo()?'Deseja sair do modo demonstração?':'Deseja sair da sua conta da equipe?',{titulo:'Sair',icon:'logout',ok:'Sair'});
   if(!ok)return;
+  // Limpa o modo demonstração (se ativo)
+  _authDemoMode=false;
+  try{localStorage.removeItem(AUTH_DEMO_KEY);}catch(_){}
   try{await AUTH().logout();}catch(_){}
   toast('Sessão encerrada');
+  // Em demo não há onUser do Firebase para remostrar o login; força a tela de auth.
+  try{const w=$('crmAuthWrap');if(w)w.style.display='flex';const pill=$('sessPill');if(pill)pill.style.display='none';}catch(_){}
 }
 function eqErr(e){
   const c=e&&(e.code||'');const m=(e&&(e.message||''))+'';
@@ -4203,6 +4656,7 @@ async function eqTrocarSenha(){
   const A=window.PetNexusAuth;
 
   function crmFirebaseErr(e){
+    if(e&&e.friendly)return e.friendly;
     const map={
       'auth/invalid-email':'E-mail inválido.',
       'auth/user-not-found':'Usuário não encontrado. Verifique se o e-mail foi autorizado.',
@@ -4258,30 +4712,70 @@ async function eqTrocarSenha(){
   };
 
   function showCRMApp(){if(wrap)wrap.style.display='none';}
+  window.showCRMApp=showCRMApp; // usado pelo modo demo (authDemo)
+  function _crmDemoActive(){try{return localStorage.getItem(AUTH_DEMO_KEY)==='1';}catch(_){return false;}}
   function showCRMAuth(){
     if(wrap)wrap.style.display='flex';
     clearErrCRM();busyCRM(false);
   }
 
   if(!A||!A.available()){
-    // Firebase não configurado — exibe o CRM em modo demo (sem login)
-    showCRMApp();
+    // Firebase indisponível. Se o usuário escolheu o modo demonstração, entra com dados locais.
+    if(_crmDemoActive()){_authDemoMode=true;showCRMApp();
+      try{const pill=$('sessPill');if(pill){pill.style.display='flex';const nm=$('sessNm');if(nm)nm.textContent='Demonstração';const rl=$('sessRl');if(rl)rl.textContent='Modo demo';}}catch(_){}
+      try{maybeStartCRMTour(true);}catch(_){}
+      return;
+    }
+    // Sem demo: FAIL CLOSED — bloqueia o CRM e exige login.
+    showCRMAuth();
+    showErrCRM('Autenticação indisponível (Firebase não configurado em petnexus-firebase.js). Acesso ao CRM bloqueado.');
     return;
   }
 
   A.onUser(async function(user){
-    if(!user){showCRMAuth();return;}
-    // Verifica se o e-mail está na allowlist (role staff/admin)
-    const allowed=await A.emailAllowedRole(user.email).catch(()=>null);
+    if(!user){
+      // Sem usuário Firebase: respeita o modo demonstração se estiver ativo.
+      if(_crmDemoActive()){_authDemoMode=true;showCRMApp();
+        try{const pill=$('sessPill');if(pill){pill.style.display='flex';const nm=$('sessNm');if(nm)nm.textContent='Demonstração';const rl=$('sessRl');if(rl)rl.textContent='Modo demo';}}catch(_){}
+        try{maybeStartCRMTour(true);}catch(_){}
+        return;
+      }
+      showCRMAuth();return;
+    }
+    // Conta demo logada (local-part começa com "demo", ex.: demo@pet.com):
+    // ANTES de qualquer lógica de staff — tudo MOCK, nunca bate no Supabase.
+    try{
+      if(window.PetNexusAuth&&PetNexusAuth.isDemoEmail&&PetNexusAuth.isDemoEmail(user.email)){
+        _authDemoMode=true;
+        try{localStorage.setItem(AUTH_DEMO_KEY,'1');}catch(_){}
+        showCRMApp();
+        try{renderAll&&renderers.dash();}catch(_){}
+        const pillD=document.getElementById('sessPill');
+        if(pillD){pillD.style.display='flex';const nmD=document.getElementById('sessNm');if(nmD)nmD.textContent='Demonstração';const rlD=document.getElementById('sessRl');if(rlD)rlD.textContent='Modo demo';}
+        // syncAgendamentosApp/syncMensagensApp já desviam para demoRenderAgenda/demoRenderMsg via _isDemo()
+        try{if(typeof syncAgendamentosApp==='function')syncAgendamentosApp();}catch(_){}
+        try{if(typeof syncMensagensApp==='function')syncMensagensApp();}catch(_){}
+        try{maybeStartCRMTour(true);}catch(_){}
+        return;
+      }
+    }catch(_){}
+    _authDemoMode=false; // login real tem prioridade sobre o demo
+    // O isolamento por domínio (@pet.com) já roda no petnexus-auth.js.
+    // Aqui exigimos papel staff/admin: todo @pet.com vira staff; a allowlist define admin.
+    const allowed=(A.isStaff&&A.isStaff())||await A.emailAllowedRole(user.email).catch(()=>null);
     if(allowed){
       showCRMApp();
       // Atualiza indicador de usuário logado (topbar)
-      const pill=document.getElementById('eqPill');
+      const pill=document.getElementById('sessPill');
       if(pill){
         pill.style.display='flex';
-        const nm=document.getElementById('eqNome');
+        const nm=document.getElementById('sessNm');
         if(nm)nm.textContent=user.displayName||user.email;
       }
+      /* Carrega dados vindos do app (Supabase) na view que estiver aberta. */
+      try{if(typeof syncAgendamentosApp==='function')syncAgendamentosApp();}catch(_){}
+      try{if(typeof syncMensagensApp==='function')syncMensagensApp();}catch(_){}
+      try{maybeStartCRMTour(false);}catch(_){}
     }else{
       // Logado mas não autorizado
       try{await firebase.auth().signOut();}catch(_){}
@@ -4310,6 +4804,42 @@ try{entBgStart();entBadge();}catch(e){console.error(e);}
 /* Equipe & Acessos: liga o callback de login para o indicador de sessão no topbar.
    Não bloqueia nada; a view "equipe" é a única que exige login. */
 try{eqWireAuth();}catch(e){console.error(e);}
+
+/* ===================================================================== */
+/* ===== TUTORIAL GUIADO (PetNexusTour) ============================== */
+const CRM_TOUR_KEY='petnexus_tour_crm_v1';
+function crmTourSteps(){
+  return [
+    {title:'Bem-vindo ao PetNexus Gestor 👋',text:'Este é o painel de controle do seu petshop. Vou te mostrar rapidamente as áreas principais. Você pode pular a qualquer momento.'},
+    {sel:'.navi a[data-v="dash"]',title:'Painel',text:'Visão geral da operação: agendamentos do dia, faturamento, alertas de estoque e vacinas.',place:'bottom'},
+    {sel:'.navi a[data-v="agenda"]',title:'Agenda',text:'Todos os agendamentos. Os que chegam pelo app do cliente aparecem destacados em "📱 Vindos do App".',place:'bottom'},
+    {sel:'.navi a[data-v="clientes"]',title:'Clientes & Pets',text:'Cadastro completo de tutores e pets, com histórico, pontos de fidelidade e prontuário.',place:'bottom'},
+    {sel:'.navi a[data-v="entregas"]',title:'Entregas ao vivo',text:'Acompanhe a frota de entregadores no mapa em tempo real e avise o cliente automaticamente.',place:'bottom'},
+    {sel:'.navi a[data-v="msg"]',title:'Mensagens',text:'Central de conversas. As mensagens vindas do app do cliente aparecem em "📱 Conversas do App", onde você responde direto.',place:'bottom'},
+    {sel:'#notifBtn',title:'Notificações',text:'O sininho avisa sobre novos agendamentos, mensagens, estoque baixo e vacinas a vencer. O número em vermelho são os não lidos.',place:'bottom'},
+    {title:'Pronto! 🎉',text:'Explore à vontade. Você pode rever este tutorial quando quiser no menu Configurações.'}
+  ];
+}
+function startCRMTour(){
+  if(!window.PetNexusTour)return;
+  // Garante começar no Painel para os destaques fazerem sentido
+  try{go('dash');}catch(_){}
+  setTimeout(()=>PetNexusTour.start(crmTourSteps(),{key:CRM_TOUR_KEY,labelDone:'Começar a usar'}),350);
+}
+function replayCRMTour(){
+  if(!window.PetNexusTour)return;
+  PetNexusTour.reset(CRM_TOUR_KEY);
+  startCRMTour();
+}
+window.replayCRMTour=replayCRMTour;
+/* Dispara automaticamente na primeira entrada (útil principalmente em modo demo). */
+function maybeStartCRMTour(force){
+  if(!window.PetNexusTour)return;
+  if(!force&&PetNexusTour.done(CRM_TOUR_KEY))return;
+  if(PetNexusTour.done(CRM_TOUR_KEY)&&!force)return;
+  // espera a UI renderizar
+  setTimeout(()=>{ if(!PetNexusTour.done(CRM_TOUR_KEY)) startCRMTour(); }, 900);
+}
 </script>
 </body>
 </html>
